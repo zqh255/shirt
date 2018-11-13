@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<title>t-shirt</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="stylesheet" type="text/css" href="./index.css">
+	</head>
+	<body>
+		<div class="a-shirt">
+			<div class="positive dis" id="positive">
+				
+			</div>
+			<div class="resverse dis" id="resverse">
+				
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript" src='./index.js'></script>
+	<script type="text/javascript">
+		var shirt = new Shirt({
+			bShirtImg:{
+				p: './t-shirt-0.png',
+				r: './t-shirt-1.png'
+			},
+			size: {
+				width: 500,
+				height: 500
+			},
+			limitSquare:{
+				w: 220,
+				h: 360
+			},
+			initLogoSize:{
+				w: 83,
+				h: 118
+			},
+			limitSquareRatio: {
+				w: 11 / 25,
+				h: 18 / 25
+			}
+		})
+		shirt.init()
+	</script>
+</html>
