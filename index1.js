@@ -134,14 +134,21 @@ Shirt.prototype = {
 
 	rotationMove(e){
 		var that = this
-		var dx = that.getPos(e).x - that.img.offsetLeft 
-		var dy = that.getPos(e).y - that.img.offsetTop 
-		console.log(Math.atan2(dx, dy))
-		that.img.style.transform = `rotate(${Math.atan2(dx, dy)}deg)`
+		var dx = e.clientX - that.img.offsetLeft
+		var dy = e.clientY - that.img.offsetTop
+		var dz = Math.sqrt(dx * dx + dy * dy)
+		if(dx > 0 && dy > 0){
+			that.rotation = Math.asin(dy / dz) + 90 * Math.PI / 180
+		}else if(dx > 0){
+			that.rotation = Math.asin(dx / dz)
+		}else if(dx < 0 && dy > 0){
+			that.rotation = -(Math.asin(dy / dz) + 90 * Math.Pi / 180)
+		}else if(dx < 0){
+			that.rotation = Math.asin(dx / dz)
+		}
+		that.img.style.transform = `rotate(${that.rotation}rad)`
 	},
-	getPos(e){
-		return {x: e.pageX, y: e.pageY}
-	}
+	
 }
 
 Shirt.prototype.constructor = Shirt
