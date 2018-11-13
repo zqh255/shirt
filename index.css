@@ -15,15 +15,52 @@ html, body{
 
 .positive{
 	width: 500px;
-	height: 500px
+	height: 500px;
+	position: relative;
+	overflow: hidden;
+	/*background: url('./t-shirt-0.png');*/
 }
 
 .resverse{
 	width: 500px;
 	height: 500px;
+	position: relative;
+	overflow: hidden;
 }
 
 img{
-	width: unset;
-	height: unset;
+	width: 100%;
+	height: 100%;
+	/*height: unset;*/
+}
+
+#imgObj{
+	/*position: absolute;*/
+}
+
+.positive-box{
+	width: 40%;
+	height: 78%;
+	position: absolute;
+    left: 30%;
+    top: 14%;
+    background-color: #ededed;
+}
+
+.scale{
+	width: 10px;
+	height: 10px;
+	background-color: #f00;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	cursor: se-resize;
+}
+
+.img-box{
+	position: absolute;
+	background-color: #abc;
+	width: 83px;
+	height:118px;
+	cursor: move;
 }
