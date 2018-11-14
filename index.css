@@ -60,7 +60,7 @@ img{
 .img-box{
 	position: absolute;
 	background-color: #abc;
-	width: 83px;
-	height:118px;
+	width: 90px;
+	height:120px;
 	cursor: move;
 }

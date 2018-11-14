@@ -18,7 +18,7 @@ function Shirt(config){
 		x: 0,
 		y: 0
 	}
-	that.rotation = 0
+	that.angle = 0
 }
 
 Shirt.prototype = {
@@ -134,19 +134,52 @@ Shirt.prototype = {
 
 	rotationMove(e){
 		var that = this
-		var dx = e.clientX - that.img.offsetLeft
-		var dy = e.clientY - that.img.offsetTop
-		var dz = Math.sqrt(dx * dx + dy * dy)
-		if(dx > 0 && dy > 0){
-			that.rotation = Math.asin(dy / dz) + 90 * Math.PI / 180
-		}else if(dx > 0){
-			that.rotation = Math.asin(dx / dz)
-		}else if(dx < 0 && dy > 0){
-			that.rotation = -(Math.asin(dy / dz) + 90 * Math.Pi / 180)
-		}else if(dx < 0){
-			that.rotation = Math.asin(dx / dz)
+		//图片圆心坐标
+		var imgCenterPosX = that.img.offsetLeft + (that.img.offsetWidth + 1) / 2
+		var imgCenterPosY = that.img.offsetTop + that.img.offsetHeight / 2
+
+		//鼠标点击坐标
+		var mouseClickX = e.clientX - that.positive.offsetLeft
+		var mouseClickY = e.clientY - that.positive.offsetTop
+
+		var x = Math.abs(imgCenterPosX - mouseClickX)
+		var y = Math.abs(imgCenterPosY - mouseClickY)
+		var z = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
+		var cos = y / z
+		var radina = Math.acos(cos) //反三角函数求弧度
+		that.angle =  Math.floor(180 / (Math.PI/radina))
+
+		// if(mouseClickX > imgCenterPosX && mouseClickY > imgCenterPosY){
+		// 	that.angle = 180 - that.angle
+		// }
+		 if(mouseClickX == imgCenterPosX && mouseClickY > imgCenterPosY){
+			that.angle = 180
 		}
-		that.img.style.transform = `rotate(${that.rotation}rad)`
+		// else if(mouseClickX > imgCenterPosX && mouseClickY == imgCenterPosY){
+		// 	that.angle = 90
+		// }
+		// else if(mouseClickX < imgCenterPosX && mouseClickY > imgCenterPosY){
+		// 	that.angle = 180 + that.angle
+		// }
+		else if(mouseClickX < imgCenterPosX && mouseClickY == imgCenterPosY){
+			that.angle = 270
+		}else if(mouseClickX < imgCenterPosX && mouseClickY < imgCenterPosY){
+			that.angle = 360 - that.angle
+		}
+		console.log(that.angle)
+		// var dx = e.clientX - that.img.offsetLeft
+		// var dy = e.clientY - that.img.offsetTop
+		// var dz = Math.sqrt(dx * dx + dy * dy)
+		// if(dx > 0 && dy > 0){
+		// 	that.rotation = Math.asin(dy / dz) + 90 * Math.PI / 180
+		// }else if(dx > 0){
+		// 	that.rotation = Math.asin(dx / dz)
+		// }else if(dx < 0 && dy > 0){
+		// 	that.rotation = -(Math.asin(dy / dz) + 90 * Math.Pi / 180)
+		// }else if(dx < 0){
+		// 	that.rotation = Math.asin(dx / dz)
+		// }
+		that.img.style.transform = `rotate(${that.angle}deg)`
 	},
 	
 }
