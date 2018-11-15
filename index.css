@@ -57,6 +57,16 @@ img{
 	cursor: se-resize;
 }
 
+.rotate{
+	width: 10px;
+	height: 10px;
+	background-color: #f00;
+	position: absolute;
+	bottom: 50%;
+	right: 0;
+	cursor: se-resize;
+}
+
 .img-box{
 	position: absolute;
 	background-color: #abc;
