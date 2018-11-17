@@ -8,6 +8,8 @@ function Shirt(config) {
   that.isMove = false
   that.isScale = false
   that.isRotate = null
+  that.isDoubleScale = false
+  that.isSingle = false
   that.status = {
     x: 0,
     y: 0,
@@ -28,6 +30,9 @@ function Shirt(config) {
 //初始的angle
 var firstAngle = 180;
 var moveAngle;
+var distance = {}
+var origin
+var scale = 1
 
 Shirt.prototype = {
   init() {
@@ -43,25 +48,72 @@ Shirt.prototype = {
     // 图片圆心
     that.imgCenterPosX = that.img.offsetLeft + (that.img.offsetWidth + 1) / 2
     that.imgCenterPosY = that.img.offsetTop + that.img.offsetHeight / 2
-    //移动
-    that.img.onmousedown = that.img.ontouchstart = function(e){
-      that.isMove = true
-      that.status.x = that.getClient(e).x - that.img.offsetLeft
-      that.status.y = that.getClient(e).y - that.img.offsetTop
 
-      that.showBorder()
-      
-      that.img.onmouseup = that.img.onmouseout = that.img.onmouseleave = that.img.ontouchend = function(e){
-        that.isMove = false
-        that.hideBorder()
+    //移动
+    that.img.onmousedown = that.img.ontouchstart = that.positive.ontouchstart = function(e){
+      if((e.clientX && e.clientY) || (e.touches.length < 2)){
+
+        that.isMove = true
+        that.status.x = that.getClient(e).x - that.img.offsetLeft
+        that.status.y = that.getClient(e).y - that.img.offsetTop
+
+        that.showBorder()
         
-        that.stopDefaultEvent(e)
+        that.img.onmouseup = that.img.onmouseout = that.img.onmouseleave = that.img.ontouchend = function(e){
+          that.isMove = false
+          that.hideBorder()
+          
+          that.stopDefaultEvent(e)
+        }
+        
+        that.img.onmousemove = that.img.ontouchmove = function(e){
+          if(that.isMove && !that.isDoubleScale){
+            that.mousemove(e)
+          }
+          that.stopDefaultEvent(e)
+        }
+      }else if(e.touches.length >= 2){
+        that.isDoubleScale = true
+        distance.start = that.getDistance({
+          x: e.touches[0].screenX,
+          y: e.touches[0].screenY
+        },{
+          x: e.touches[1].screenX,
+          y: e.touches[1].screenY
+        })
+        //that.isScale = true
+        that.positive.ontouchend = function(e){
+          that.isDoubleScale = false
+          //that.isScale = false
+        }
+        that.positive.ontouchmove = function(e){
+          if(e.touches.length >= 2 && that.isDoubleScale){
+            //var scale = that.getDistance(e.touches[0], e.touches[1])
+            origin = that.getOrigin({
+              x: e.touches[0].pageX,
+              y: e.touches[0].pageY
+            },{
+              x: e.touches[1].pageX,
+              y: e.touches[1].pageY
+            })
+
+            distance.stop = that.getDistance({
+              x: e.touches[0].screenX,
+              y: e.touches[0].screenY
+            },{
+              x: e.touches[1].screenX,
+              y: e.touches[1].screenY
+            })
+            
+            scale = distance.stop / distance.start
+
+            that.img.style.transform = 'scale(' + scale +')';
+            
+            that.stopDefaultEvent(e)
+          }
+        }
       }
       
-      that.img.onmousemove = that.img.ontouchmove = function(e){
-        that.mousemove(e)
-        that.stopDefaultEvent(e)
-      }
     }
 
     //放大缩小
@@ -89,6 +141,51 @@ Shirt.prototype = {
         that.stopDefaultEvent(e)
       }
     }
+
+    //放大缩小(双指控制)
+    // that.positive.ontouchstart = function(e){
+    //   if(e.touches.length >= 2){
+    //     that.isDoubleScale = true
+    //     distance.start = that.getDistance({
+    //       x: e.touches[0].screenX,
+    //       y: e.touches[0].screenY
+    //     },{
+    //       x: e.touches[1].screenX,
+    //       y: e.touches[1].screenY
+    //     })
+    //     //that.isScale = true
+    //   }
+    //   that.positive.ontouchend = function(e){
+    //     that.isDoubleScale = false
+    //     //that.isScale = false
+    //   }
+    //   that.positive.ontouchmove = function(e){
+    //     if(e.touches.length >= 2 && that.isDoubleScale){
+    //       //var scale = that.getDistance(e.touches[0], e.touches[1])
+    //       origin = that.getOrigin({
+    //         x: e.touches[0].pageX,
+    //         y: e.touches[0].pageY
+    //       },{
+    //         x: e.touches[1].pageX,
+    //         y: e.touches[1].pageY
+    //       })
+
+    //       distance.stop = that.getDistance({
+    //         x: e.touches[0].screenX,
+    //         y: e.touches[0].screenY
+    //       },{
+    //         x: e.touches[1].screenX,
+    //         y: e.touches[1].screenY
+    //       })
+          
+    //       scale = distance.stop / distance.start
+
+    //       that.img.style.transform = 'scale(' + scale +')';
+          
+    //       that.stopDefaultEvent(e)
+    //     }
+    //   }
+    // }
 
     //旋转
     that.rotate.onmousedown = that.rotate.ontouchstart = function (e) {
@@ -123,6 +220,7 @@ Shirt.prototype = {
       }
     }
   },
+
   showBorder(){
     this.positive.style.border = '1px dashed'
   },
@@ -144,6 +242,19 @@ Shirt.prototype = {
     }
     e.stopPropagation()
   },
+  getDistance(start, stop) {
+    return Math.sqrt(Math.pow((stop.x - start.x), 2) + Math.pow((stop.y - start.y), 2))
+  },
+  getScale(start, stop){
+    return getDistance(start[0], start[1]) / getDistance(stop[0], stop[1])
+  },
+  getOrigin(first, second) {
+    return {
+        x: (first.x + second.x) / 2,
+        y: (first.y + second.y) / 2
+    };
+  },
+
   mousemove(e){
     var that = this
     if(that.isMove){
@@ -178,6 +289,7 @@ Shirt.prototype = {
       h = h >= that.positive.offsetHeight - that.img.offsetTop ?
            that.positive.offsetHeight - that.img.offsetTop :
            h
+     
       that.img.style.width = w + 'px'
       that.img.style.height = h + 'px'
     }
@@ -237,7 +349,7 @@ Shirt.prototype = {
 
     moveAngle = angle;
 
-    that.img.style.transform = 'rotate(' + angle + 'deg)';
+    that.img.style.transform = 'rotate(' + angle + 'deg) scale(' + scale +')';
   },
 
   getClient(e){
