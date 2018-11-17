@@ -23,9 +23,8 @@ function Shirt(config){
 	that.angle = 0
 }
 
-var initAngle = 90
 //初始的angle
-var firstAngle = initAngle;
+var firstAngle = 180;
 var moveAngle;
 
 Shirt.prototype = {
@@ -43,22 +42,22 @@ Shirt.prototype = {
 	    that.imgCenterPosX = that.img.offsetLeft + (that.img.offsetWidth + 1) / 2
 	    that.imgCenterPosY = that.img.offsetTop + that.img.offsetHeight / 2
 
-		that.img.onmousedown = function(e){
+		that.img.onmousedown = that.img.ontouchstart = function(e){
 			that.isMove = true
-			that.status.x = e.clientX - that.img.offsetLeft
-			that.status.y = e.clientY - that.img.offsetTop
+			that.status.x = that.getClient(e).x - that.img.offsetLeft
+			that.status.y = that.getClient(e).y - that.img.offsetTop
 
 			that.showBorder()
 			
 
-			that.img.onmouseup = that.img.onmouseout = that.img.onmouseleave  = function(e){
+			that.img.onmouseup = that.img.onmouseout = that.img.onmouseleave = that.img.ontouchend = function(e){
 				that.isMove = false
 				that.hideBorder()
 				
 				that.stopDefaultEvent(e)
 			}
 			
-			that.img.onmousemove = function(e){
+			that.img.onmousemove = that.img.ontouchmove = function(e){
 				that.mousemove(e)
 				that.stopDefaultEvent(e)
 			}
@@ -68,52 +67,56 @@ Shirt.prototype = {
 		
 
 		//放大缩小
-		that.scale.onmousedown = function(e){
+		that.scale.onmousedown = that.scale.ontouchstart = function(e){
 			that.stopDefaultEvent(e)
 			that.isScale = true
 			that.pos = {
 				w: that.img.offsetWidth,
 				h: that.img.offsetHeight,
-				x: e.clientX,
-				y: e.clientY
+				x: that.getClient(e).x,
+				y: that.getClient(e).y
 			}
 
 			that.showBorder()
 
-			that.img.onmouseup = that.positive.onmouseup = that.positive.onmouseleave  = function(e){
+			that.img.onmouseup = that.positive.onmouseup = that.positive.onmouseleave = 
+			that.img.ontouchend = that.positive.ontouchend = function(e){
 				that.isScale = false
 				that.hideBorder()
-				// firstAngle = moveAngle + 180;
-		  //       if (e.clientX - that.positive.offsetLeft > that.imgCenterPosX) {
-		  //         firstAngle = moveAngle + 180;
-		  //       }
 			}
 
-			that.img.onmousemove = that.positive.onmousemove = function(e){
-				that.scaleMove(e)
-				// if (that.isScale) {
-		  //         that.rotationMove(e)
-		  //       }
-			
+			that.img.onmousemove = that.positive.onmousemove = 
+			that.img.ontouchmove = that.positive.ontouchmove = function(e){
+				that.scaleMove(e)		
 				that.stopDefaultEvent(e)
 			}
 		}
 
-		that.rotate.onmousedown = function(e){
+		that.rotate.onmousedown = that.rotate.ontouchstart = function(e){
 			that.stopDefaultEvent(e)
 			that.isRotate = true
+			
+			that.pos = {
+		       w: that.img.offsetWidth,
+		       h: that.img.offsetHeight,
+		       x: that.getClient(e).x,
+		       y: that.getClient(e).y
+		     }
+
 			that.showBorder()
-			that.img.onmouseup = that.positive.onmouseup  = function(e){
+			that.img.onmouseup = that.positive.onmouseup = 
+			that.img.ontouchend = that.positive.ontouchend = function(e){
 				that.isRotate = false
 				that.hideBorder()
-				firstAngle = moveAngle + initAngle;
+				firstAngle = moveAngle + 180
 
-		        if (e.clientX - that.positive.offsetLeft > that.imgCenterPosX) {
-		          firstAngle = moveAngle + initAngle;
+		        if (that.getClient(e).x - that.positive.offsetLeft > that.imgCenterPosX) {
+		          firstAngle = moveAngle + 180;
 		        }
 			}
 
-			that.img.onmousemove = that.positive.onmousemove = function(e){
+			that.img.onmousemove = that.positive.onmousemove = 
+			that.img.ontouchmove = that.positive.ontouchmove = function(e){
 				if(that.isRotate){
 					that.rotationMove(e)
 				}
@@ -141,8 +144,8 @@ Shirt.prototype = {
 	mousemove(e){
 		var that = this
 		if(that.isMove){
-			var x = e.clientX - that.status.x
-			var y = e.clientY - that.status.y
+			var x = that.getClient(e).x - that.status.x
+			var y = that.getClient(e).y - that.status.y
 
 			//边界判断
 			x = x <= 0 ? 1 : x - 1
@@ -163,8 +166,8 @@ Shirt.prototype = {
 	scaleMove(e){
 		var that = this
 		if(that.isScale){
-			var w = Math.max(30, e.clientX - that.pos.x + that.pos.w)
-			var h = Math.max(30, e.clientY - that.pos.y + that.pos.h)
+			var w = Math.max(30, that.getClient(e).x - that.pos.x + that.pos.w)
+			var h = Math.max(30, that.getClient(e).y - that.pos.y + that.pos.h)
 
 			w = w >= that.positive.offsetWidth - that.img.offsetLeft ?
 					 that.positive.offsetWidth - that.img.offsetLeft :
@@ -184,58 +187,72 @@ Shirt.prototype = {
 	},
 
 	rotationMove(e) {
-    var that = this
+	    var that = this
 
-    // 按下的坐标
-    var dx = that.pos.x - that.positive.offsetLeft;
-    var dy = that.pos.y - that.positive.offsetTop;
-    //鼠标移动坐标 px py
-    var px = e.clientX - that.positive.offsetLeft;
-    var py = e.clientY - that.positive.offsetTop;
-    // 中心点 that.imgCenterPosX  that.imgCenterPosY
-    var mx = that.imgCenterPosX;
-    var my = that.imgCenterPosY;
+	    // 按下的坐标
+	    var dx = that.pos.x - that.positive.offsetLeft;
+	    var dy = that.pos.y - that.positive.offsetTop;
+	    //鼠标移动坐标 px py
+	    var px = e.clientX - that.positive.offsetLeft;
+	    var py = e.clientY - that.positive.offsetTop;
+	    // 中心点 that.imgCenterPosX  that.imgCenterPosY
+	    var mx = that.imgCenterPosX;
+	    var my = that.imgCenterPosY;
 
-    //三个点就是一个三角形，求夹角就好
-    //A(dx, dy), B(mx, my), C(px, py)
-    //AB(mx - dx, my - dy) BC(px - mx, py - my)
-    //参考链接：https://www.zybang.com/question/a867f3f31331c41ec123fdb26299665c.html
-    var x2 = Math.pow(mx - dx, 2);
-    var y2 = Math.pow(my - dy, 2);
-    var x1 = Math.pow(px - mx, 2);
-    var y1 = Math.pow(py - my, 2);
+	    //三个点就是一个三角形，求夹角就好
+	    //A(dx, dy), B(mx, my), C(px, py)
+	    //AB(mx - dx, my - dy) BC(px - mx, py - my)
+	    //参考链接：https://www.zybang.com/question/a867f3f31331c41ec123fdb26299665c.html
+	    var x2 = Math.pow(mx - dx, 2);
+	    var y2 = Math.pow(my - dy, 2);
+	    var x1 = Math.pow(px - mx, 2);
+	    var y1 = Math.pow(py - my, 2);
 
-    var cos = ((mx - dx) * (px - mx) + (my - dy) * (py - my)) / (Math.sqrt(x1 + y1) * Math.sqrt(x2 + y2));
+	    var cos = ((mx - dx) * (px - mx) + (my - dy) * (py - my)) / (Math.sqrt(x1 + y1) * Math.sqrt(x2 + y2));
 
-    var angle;
+	    var angle;
 
-    //AB连成直线，判断C点在线的哪一侧来区分方向。
-    //AB线方程: y = kx + b
+	    //AB连成直线，判断C点在线的哪一侧来区分方向。
+	    //AB线方程: y = kx + b
 
-    var k = (my - dy) / (mx - dx);
-    var b = dy - k * dx;
-    //y = k * x + (dy - k * dx)
-    var val = k * px + dy - k * dx
+	    var k = (my - dy) / (mx - dx);
+	    var b = dy - k * dx;
+	    //y = k * x + (dy - k * dx)
+	    var val = k * px + dy - k * dx
 
-    if (dx < mx) {
-      if (val >= py) {
-          angle = firstAngle - Math.abs(Math.acos(cos) / Math.PI * 180);
-      } else {
-          angle = firstAngle + Math.abs(Math.acos(cos) / Math.PI * 180);
-      }
-    } else {
-      if (val >= py) {
-          angle = firstAngle + Math.abs(Math.acos(cos) / Math.PI * 180);
-      } else {
-          angle = firstAngle - Math.abs(Math.acos(cos) / Math.PI * 180);
-      }
-    }
+	    if (dx < mx) {
+	      if (val >= py) {
+	          angle = firstAngle - Math.abs(Math.acos(cos) / Math.PI * 180);
+	      } else {
+	          angle = firstAngle + Math.abs(Math.acos(cos) / Math.PI * 180);
+	      }
+	    } else {
+	      if (val >= py) {
+	          angle = firstAngle + Math.abs(Math.acos(cos) / Math.PI * 180);
+	      } else {
+	          angle = firstAngle - Math.abs(Math.acos(cos) / Math.PI * 180);
+	      }
+	    }
 
-    moveAngle = angle;
+	    moveAngle = angle;
 
-    that.img.style.transform = 'rotate(' + angle + 'deg)';
-  },
-	
+	    that.img.style.transform = 'rotate(' + angle + 'deg)';
+  	},
+
+  getClient(e){
+  	var pos = {x: null, y: null}
+  	if(e.clientX && e.clientY){
+  		pos.x = e.clientX
+  		pos.y = e.clientY
+  	}else if(e.touches[0] && e.touches[0].clientX && e.touches[0].clientY){
+		pos.x = e.touches[0].clientX
+  		pos.y = e.touches[0].clientY
+  	}else if(e.changedTouches[0] && e.changedTouches[0].clientX && e.changedTouches[0].clientY){
+  		pos.x = e.changedTouches[0].clientX
+  		pos.y = e.changedTouches[0].clientY
+  	}
+  	return pos
+  }
 }
 
 Shirt.prototype.constructor = Shirt

@@ -7,6 +7,7 @@ function Shirt(config) {
   that.rotate = null
   that.isMove = false
   that.isScale = false
+  that.isRotate = null
   that.status = {
     x: 0,
     y: 0,
@@ -42,50 +43,97 @@ Shirt.prototype = {
     // 图片圆心
     that.imgCenterPosX = that.img.offsetLeft + (that.img.offsetWidth + 1) / 2
     that.imgCenterPosY = that.img.offsetTop + that.img.offsetHeight / 2
+    //移动
+    that.img.onmousedown = that.img.ontouchstart = function(e){
+      that.isMove = true
+      that.status.x = that.getClient(e).x - that.img.offsetLeft
+      that.status.y = that.getClient(e).y - that.img.offsetTop
+
+      that.showBorder()
+      
+      that.img.onmouseup = that.img.onmouseout = that.img.onmouseleave = that.img.ontouchend = function(e){
+        that.isMove = false
+        that.hideBorder()
+        
+        that.stopDefaultEvent(e)
+      }
+      
+      that.img.onmousemove = that.img.ontouchmove = function(e){
+        that.mousemove(e)
+        that.stopDefaultEvent(e)
+      }
+    }
 
     //放大缩小
-    that.scale.onmousedown = function (e) {
+    that.scale.onmousedown = that.scale.ontouchstart = function(e){
       that.stopDefaultEvent(e)
       that.isScale = true
-       //that.img.onmouseup
       that.pos = {
         w: that.img.offsetWidth,
         h: that.img.offsetHeight,
-        x: e.clientX,
-        y: e.clientY
+        x: that.getClient(e).x,
+        y: that.getClient(e).y
       }
 
-      that.img.onmouseup = that.positive.onmouseup = that.positive.onmouseleave = function (e) {
-        that.isScale = false;
+      that.showBorder()
+
+      that.img.onmouseup = that.positive.onmouseup = that.positive.onmouseleave = 
+      that.img.ontouchend = that.positive.ontouchend = function(e){
+        that.isScale = false
+        that.hideBorder()
+      }
+
+      that.img.onmousemove = that.positive.onmousemove = 
+      that.img.ontouchmove = that.positive.ontouchmove = function(e){
+        that.scaleMove(e)   
+        that.stopDefaultEvent(e)
+      }
+    }
+
+    //旋转
+    that.rotate.onmousedown = that.rotate.ontouchstart = function (e) {
+      that.stopDefaultEvent(e)
+      that.rotate = true
+      that.showBorder()
+      that.pos = {
+        w: that.img.offsetWidth,
+        h: that.img.offsetHeight,
+        x: that.getClient(e).x,
+        y: that.getClient(e).y
+      }
+
+      that.img.onmouseup = that.positive.onmouseup = that.positive.onmouseleave = 
+      that.img.ontouchend = that.positive.ontouchend = function (e) {
+        that.rotate = false;
+        that.hideBorder()
         //console.log(that.img.style.transform.rotate)
         firstAngle = moveAngle + 180;
-        if (e.clientX - that.positive.offsetLeft > that.imgCenterPosX) {
+        if (that.getClient(e).x - that.positive.offsetLeft > that.imgCenterPosX) {
           firstAngle = moveAngle + 180;
         }
 
       }
 
-      that.img.onmousemove = that.positive.onmousemove = function (e) {
-        if (that.isScale) {
+      that.img.onmousemove = that.positive.onmousemove = 
+      that.img.ontouchmove = that.positive.ontouchmove = function (e) {
+        if (that.rotate) {
           that.rotationMove(e)
         }
         that.stopDefaultEvent(e)
       }
     }
-
-    // that.rotate.onmousedown = function(e){
-    //   that.isScale = true
-    //    that.img.onmouseup = that.positive.onmouseup = that.positive.onmouseleave = function (e) {
-    //     that.isScale = false
-    //   }
-
-    //   that.img.onmousemove = that.positive.onmousemove = function (e) {
-    //     if (that.isScale) {
-    //       that.rotationMove(e)
-    //     }
-    //     that.stopDefaultEvent(e)
-    //   }
-    // }
+  },
+  showBorder(){
+    this.positive.style.border = '1px dashed'
+  },
+  hideBorder(){
+    this.positive.style.border = 'unset'
+  },
+  showImgBorder(){
+    that.img.style = '1px dashed'
+  },
+  hideImgBorder(){
+    that.img.style = '1px dashed'
   },
   stopDefaultEvent(e) {
     if (e.preventDefault) {
@@ -95,6 +143,44 @@ Shirt.prototype = {
       e.returnValue = false
     }
     e.stopPropagation()
+  },
+  mousemove(e){
+    var that = this
+    if(that.isMove){
+      var x = that.getClient(e).x - that.status.x
+      var y = that.getClient(e).y - that.status.y
+
+      //边界判断
+      x = x <= 0 ? 1 : x - 1
+      y = y <= 0 ? 1 : y - 1
+
+      x = x >=  that.positive.offsetWidth - that.img.offsetWidth ? 
+            that.positive.offsetWidth - that.img.offsetWidth - 2:
+            x
+      y = y >= that.positive.offsetHeight - that.img.offsetHeight ? 
+           that.positive.offsetHeight - that.img.offseHeight - 2:
+           y
+
+      that.img.style.left = x + 'px'
+      that.img.style.top = y + 'px'
+    }
+  },
+  scaleMove(e){
+    var that = this
+    if(that.isScale){
+      var w = Math.max(30, that.getClient(e).x - that.pos.x + that.pos.w)
+      var h = Math.max(30, that.getClient(e).y - that.pos.y + that.pos.h)
+
+      w = w >= that.positive.offsetWidth - that.img.offsetLeft ?
+           that.positive.offsetWidth - that.img.offsetLeft :
+           w
+
+      h = h >= that.positive.offsetHeight - that.img.offsetTop ?
+           that.positive.offsetHeight - that.img.offsetTop :
+           h
+      that.img.style.width = w + 'px'
+      that.img.style.height = h + 'px'
+    }
   },
   setLocation() {
     var that = this
@@ -108,8 +194,8 @@ Shirt.prototype = {
     var dx = that.pos.x - that.positive.offsetLeft;
     var dy = that.pos.y - that.positive.offsetTop;
     //鼠标移动坐标 px py
-    var px = e.clientX - that.positive.offsetLeft;
-    var py = e.clientY - that.positive.offsetTop;
+    var px = that.getClient(e).x - that.positive.offsetLeft;
+    var py = that.getClient(e).y - that.positive.offsetTop;
     // 中心点 that.imgCenterPosX  that.imgCenterPosY
     var mx = that.imgCenterPosX;
     var my = that.imgCenterPosY;
@@ -153,6 +239,21 @@ Shirt.prototype = {
 
     that.img.style.transform = 'rotate(' + angle + 'deg)';
   },
+
+  getClient(e){
+    var pos = {x: null, y: null}
+    if(e.clientX && e.clientY){
+      pos.x = e.clientX
+      pos.y = e.clientY
+    }else if(e.touches[0] && e.touches[0].clientX && e.touches[0].clientY){
+    pos.x = e.touches[0].clientX
+      pos.y = e.touches[0].clientY
+    }else if(e.changedTouches[0] && e.changedTouches[0].clientX && e.changedTouches[0].clientY){
+      pos.x = e.changedTouches[0].clientX
+      pos.y = e.changedTouches[0].clientY
+    }
+    return pos
+  }
 }
 
 Shirt.prototype.constructor = Shirt
