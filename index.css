@@ -18,7 +18,7 @@ html, body{
 	height: 500px;
 	position: relative;
 	overflow: hidden;
-	/*background: url('./t-shirt-0.png');*/
+	background: url('./t-shirt-0.png');
 }
 
 .resverse{
@@ -44,27 +44,29 @@ img{
 	position: absolute;
     left: 30%;
     top: 14%;
-    background-color: #ededed;
+    /*background-color: #ededed;*/
 }
 
 .scale{
-	width: 10px;
-	height: 10px;
+	width: 32px;
+	height: 32px;
 	background-color: #f00;
 	position: absolute;
-	bottom: 0;
-	right: 0;
-	cursor: se-resize;
+	bottom: -16px;
+	right: -16px;
+	/*cursor: se-resize;*/
+	background: url('./scale.png') no-repeat;
 }
 
 .rotate{
-	width: 10px;
-	height: 10px;
+	width: 32px;
+	height: 32px;
 	background-color: #f00;
 	position: absolute;
-	bottom: 50%;
-	right: 0;
-	cursor: se-resize;
+	top: -16px;
+	right: -16px;
+	background: url('./rotate.png') no-repeat;
+	/*cursor: se-resize;*/
 }
 
 .img-box{
@@ -72,5 +74,5 @@ img{
 	background-color: #abc;
 	width: 90px;
 	height:120px;
-	cursor: move;
+	/*cursor: move;*/
 }

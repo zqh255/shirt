@@ -4,8 +4,10 @@ function Shirt(config){
 	that.img = null
 	that.positive = null
 	that.scale = null
+	that.rotate = null
 	that.isMove = false
 	that.isScale = false
+	that.isRotate = false
 	that.status = {
 		x: 0,
 		y: 0,
@@ -21,6 +23,11 @@ function Shirt(config){
 	that.angle = 0
 }
 
+var initAngle = 90
+//初始的angle
+var firstAngle = initAngle;
+var moveAngle;
+
 Shirt.prototype = {
 	init(){
 		var that = this
@@ -29,19 +36,25 @@ Shirt.prototype = {
 		that.scale = document.getElementById('scale')
 		// positive.style.background =  `url(${that.config.bShirtImg.p}) no-repeat`
 		that.img = document.getElementById('imgBox')
-
+		that.rotate = document.getElementById('rotate')
 		that.setLocation()
+
+		 // 图片圆心
+	    that.imgCenterPosX = that.img.offsetLeft + (that.img.offsetWidth + 1) / 2
+	    that.imgCenterPosY = that.img.offsetTop + that.img.offsetHeight / 2
 
 		that.img.onmousedown = function(e){
 			that.isMove = true
 			that.status.x = e.clientX - that.img.offsetLeft
 			that.status.y = e.clientY - that.img.offsetTop
 
-			that.positive.style.border = '1px dashed'
+			that.showBorder()
+			
 
 			that.img.onmouseup = that.img.onmouseout = that.img.onmouseleave  = function(e){
 				that.isMove = false
-				that.positive.style.border = 'unset'
+				that.hideBorder()
+				
 				that.stopDefaultEvent(e)
 			}
 			
@@ -65,18 +78,56 @@ Shirt.prototype = {
 				y: e.clientY
 			}
 
+			that.showBorder()
+
 			that.img.onmouseup = that.positive.onmouseup = that.positive.onmouseleave  = function(e){
 				that.isScale = false
+				that.hideBorder()
+				// firstAngle = moveAngle + 180;
+		  //       if (e.clientX - that.positive.offsetLeft > that.imgCenterPosX) {
+		  //         firstAngle = moveAngle + 180;
+		  //       }
 			}
 
 			that.img.onmousemove = that.positive.onmousemove = function(e){
 				that.scaleMove(e)
-				that.rotationMove(e)
+				// if (that.isScale) {
+		  //         that.rotationMove(e)
+		  //       }
+			
 				that.stopDefaultEvent(e)
 			}
 		}
 
+		that.rotate.onmousedown = function(e){
+			that.stopDefaultEvent(e)
+			that.isRotate = true
+			that.showBorder()
+			that.img.onmouseup = that.positive.onmouseup  = function(e){
+				that.isRotate = false
+				that.hideBorder()
+				firstAngle = moveAngle + initAngle;
+
+		        if (e.clientX - that.positive.offsetLeft > that.imgCenterPosX) {
+		          firstAngle = moveAngle + initAngle;
+		        }
+			}
+
+			that.img.onmousemove = that.positive.onmousemove = function(e){
+				if(that.isRotate){
+					that.rotationMove(e)
+				}
+		        
+				that.stopDefaultEvent(e)
+			}
+		}
 		
+	},
+	showBorder(){
+		this.positive.style.border = '1px dashed'
+	},
+	hideBorder(){
+		this.positive.style.border = 'unset'
 	},
 	stopDefaultEvent(e){
 		if(e.preventDefault){
@@ -132,55 +183,58 @@ Shirt.prototype = {
 		that.img.style.top = (that.positive.offsetHeight - that.img.offsetHeight) / 2
 	},
 
-	rotationMove(e){
-		var that = this
-		//图片圆心坐标
-		var imgCenterPosX = that.img.offsetLeft + (that.img.offsetWidth + 1) / 2
-		var imgCenterPosY = that.img.offsetTop + that.img.offsetHeight / 2
+	rotationMove(e) {
+    var that = this
 
-		//鼠标点击坐标
-		var mouseClickX = e.clientX - that.positive.offsetLeft
-		var mouseClickY = e.clientY - that.positive.offsetTop
+    // 按下的坐标
+    var dx = that.pos.x - that.positive.offsetLeft;
+    var dy = that.pos.y - that.positive.offsetTop;
+    //鼠标移动坐标 px py
+    var px = e.clientX - that.positive.offsetLeft;
+    var py = e.clientY - that.positive.offsetTop;
+    // 中心点 that.imgCenterPosX  that.imgCenterPosY
+    var mx = that.imgCenterPosX;
+    var my = that.imgCenterPosY;
 
-		var x = Math.abs(imgCenterPosX - mouseClickX)
-		var y = Math.abs(imgCenterPosY - mouseClickY)
-		var z = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
-		var cos = y / z
-		var radina = Math.acos(cos) //反三角函数求弧度
-		that.angle =  Math.floor(180 / (Math.PI/radina))
+    //三个点就是一个三角形，求夹角就好
+    //A(dx, dy), B(mx, my), C(px, py)
+    //AB(mx - dx, my - dy) BC(px - mx, py - my)
+    //参考链接：https://www.zybang.com/question/a867f3f31331c41ec123fdb26299665c.html
+    var x2 = Math.pow(mx - dx, 2);
+    var y2 = Math.pow(my - dy, 2);
+    var x1 = Math.pow(px - mx, 2);
+    var y1 = Math.pow(py - my, 2);
 
-		// if(mouseClickX > imgCenterPosX && mouseClickY > imgCenterPosY){
-		// 	that.angle = 180 - that.angle
-		// }
-		 if(mouseClickX == imgCenterPosX && mouseClickY > imgCenterPosY){
-			that.angle = 180
-		}
-		// else if(mouseClickX > imgCenterPosX && mouseClickY == imgCenterPosY){
-		// 	that.angle = 90
-		// }
-		// else if(mouseClickX < imgCenterPosX && mouseClickY > imgCenterPosY){
-		// 	that.angle = 180 + that.angle
-		// }
-		else if(mouseClickX < imgCenterPosX && mouseClickY == imgCenterPosY){
-			that.angle = 270
-		}else if(mouseClickX < imgCenterPosX && mouseClickY < imgCenterPosY){
-			that.angle = 360 - that.angle
-		}
-		console.log(that.angle)
-		// var dx = e.clientX - that.img.offsetLeft
-		// var dy = e.clientY - that.img.offsetTop
-		// var dz = Math.sqrt(dx * dx + dy * dy)
-		// if(dx > 0 && dy > 0){
-		// 	that.rotation = Math.asin(dy / dz) + 90 * Math.PI / 180
-		// }else if(dx > 0){
-		// 	that.rotation = Math.asin(dx / dz)
-		// }else if(dx < 0 && dy > 0){
-		// 	that.rotation = -(Math.asin(dy / dz) + 90 * Math.Pi / 180)
-		// }else if(dx < 0){
-		// 	that.rotation = Math.asin(dx / dz)
-		// }
-		that.img.style.transform = `rotate(${that.angle}deg)`
-	},
+    var cos = ((mx - dx) * (px - mx) + (my - dy) * (py - my)) / (Math.sqrt(x1 + y1) * Math.sqrt(x2 + y2));
+
+    var angle;
+
+    //AB连成直线，判断C点在线的哪一侧来区分方向。
+    //AB线方程: y = kx + b
+
+    var k = (my - dy) / (mx - dx);
+    var b = dy - k * dx;
+    //y = k * x + (dy - k * dx)
+    var val = k * px + dy - k * dx
+
+    if (dx < mx) {
+      if (val >= py) {
+          angle = firstAngle - Math.abs(Math.acos(cos) / Math.PI * 180);
+      } else {
+          angle = firstAngle + Math.abs(Math.acos(cos) / Math.PI * 180);
+      }
+    } else {
+      if (val >= py) {
+          angle = firstAngle + Math.abs(Math.acos(cos) / Math.PI * 180);
+      } else {
+          angle = firstAngle - Math.abs(Math.acos(cos) / Math.PI * 180);
+      }
+    }
+
+    moveAngle = angle;
+
+    that.img.style.transform = 'rotate(' + angle + 'deg)';
+  },
 	
 }
 
