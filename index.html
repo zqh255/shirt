@@ -1,50 +1,120 @@
-<html>
-	<head>
-		<title>t-shirt</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<meta name="viewport" content="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no"> 
-		<link rel="stylesheet" type="text/css" href="./index.css">
-	</head>
-	<body>
-		<div class="a-shirt">
-			<div class="positive dis" id="positive">
-				<div class="positive-box" id="positiveBox">
-					<div class="img-box" id="imgBox">
-						<img id="imgObj" src="logo.png" style="cursor: move">
-						<div class="scale" id='scale'></div>
-						<div class="rotate" id="rotate"></div>
-					</div>
+<html><head>
+	<title>t-shirt</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="./index.css">
+</head>
+<body>
+<div class="shirt-wrapper">
+	<div class="a-shirt">
+		<div class="positive dis" id="positive">
+			<div class="box" id="box">
+				<div class="img-box" id="imgBox" style="left: 55px; top: 135px;">
+					<img id="imgObj1" src="logo.png" style="cursor: move">
+					<div class="scale" id="scale"></div>
+					<div class="rotate" id="rotate"></div>
+					<!--<div class="select" id="select"></div>-->
 				</div>
 			</div>
-			<div class="resverse dis" id="resverse">
-				
+		</div>
+
+		<div class="reverse dis" id="resverse">
+			<div class="box" id="box1">
+				<div class="img-box" id="imgBox1" style="left: 55px; top: 135px;">
+					<img id="imgObj" src="logo.png" style="cursor: move">
+					<div class="scale" id="scale1"></div>
+					<div class="rotate" id="rotate1"></div>
+					<!--<div class="select" id="select1"></div>-->
+				</div>
 			</div>
 		</div>
-	</body>
-	<script type="text/javascript" src='./index3.js'></script>
-	<script type="text/javascript">
-		var shirt = new Shirt({
-			bShirtImg:{
-				p: './t-shirt-0.png',
-				r: './t-shirt-1.png'
-			},
-			size: {
-				width: 500,
-				height: 500
-			},
-			limitSquare:{
-				w: 220,
-				h: 360
-			},
-			initLogoSize:{
-				w: 90,
-				h: 120
-			},
-			limitSquareRatio: {
-				w: 11 / 25,
-				h: 18 / 25
-			}
-		})
-		shirt.init()
-	</script>
-</html>
+	</div>
+</div>
+
+<div style="display: inline-block;margin-top: 20px">
+	<div id="zDom" class="btn" onclick="showZ()">正面</div>
+	<div id="fDom" class="btn" onclick="showF()">反面</div>
+</div>
+
+<script type="text/javascript" src="./index3.js"></script>
+<script type="text/javascript">
+    var shirt = new Shirt({
+        bShirtImg:{
+            p: './t-shirt-0.png',
+            r: './t-shirt-1.png'
+        },
+        size: {
+            width: 500,
+            height: 500
+        },
+        limitSquare:{
+            w: 220,
+            h: 360
+        },
+        initLogoSize:{
+            w: 90,
+            h: 120
+        },
+        limitSquareRatio: {
+            w: 11 / 25,
+            h: 18 / 25
+        },
+        isShow: true
+    })
+    shirt.init({
+        parentDom: 'positive',
+        boxDom: 'box',
+        imgBox: 'imgBox',
+        scale: 'scale',
+        rotate: 'rotate',
+        select: 'select'
+    })
+
+    var shirt1 = new Shirt({
+        bShirtImg:{
+            p: './t-shirt-0.png',
+            r: './t-shirt-1.png'
+        },
+        size: {
+            width: 500,
+            height: 500
+        },
+        limitSquare:{
+            w: 220,
+            h: 360
+        },
+        initLogoSize:{
+            w: 90,
+            h: 120
+        },
+        limitSquareRatio: {
+            w: 11 / 25,
+            h: 18 / 25
+        },
+		isShow: false
+    })
+
+    shirt1.init({
+        parentDom: 'resverse',
+        boxDom: 'box1',
+        imgBox: 'imgBox1',
+        scale: 'scale1',
+        rotate: 'rotate1',
+		select: 'select1'
+    })
+	
+	function showZ() {
+		var positive = document.getElementById('positive')
+		var resverse = document.getElementById('resverse')
+        positive.style.display = 'block'
+        resverse.style.display = 'none'
+    }
+    
+    function showF() {
+        var positive = document.getElementById('positive')
+        var resverse = document.getElementById('resverse')
+        positive.style.display = 'none'
+        resverse.style.display = 'block'
+    }
+</script>
+</body></html>

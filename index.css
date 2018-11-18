@@ -1,81 +1,118 @@
-html, body{
-	margin: 0 auto;
-	padding: 0;
+html, body {
+    margin: 0 auto;
+    padding: 0;
 }
 
-.dis{
-	display: inline-block;
-	border: 1px solid #e9e9e9;
+.dis {
+    display: inline-block;
+    border: 1px solid #e9e9e9;
 }
 
-.a-shirt{
-	width: 100%;
-	height: 100%;
+.shirt-wrapper {
+    /*transform-style: preserve-3d;*/
 }
 
-.positive{
-	width: 500px;
-	height: 500px;
-	position: relative;
-	overflow: hidden;
-	background: url('./t-shirt-0.png');
+.a-shirt {
+    /*width: 100%;*/
+    /*height: 100%;*/
+    /*transform-style: preserve-3d;*/
+    /*transition: .4s linear;*/
+    /*transform-origin: 0% 100%;*/
 }
 
-.resverse{
-	width: 500px;
-	height: 500px;
-	position: relative;
-	overflow: hidden;
+.positive {
+    width: 500px;
+    height: 500px;
+    position: relative;
+    /*position: absolute;*/
+    /*overflow: hidden;*/
+    background: url('./t-shirt-0.png');
+    /*transform: rotateY(-45deg) translateZ(86px);*/
 }
 
-img{
-	width: 100%;
-	height: 100%;
-	/*height: unset;*/
+.reverse {
+    width: 500px;
+    height: 500px;
+    position: relative;
+    /*position: absolute;*/
+    /*overflow: hidden;*/
+    background: url('./t-shirt-1.png');
+    /*transform: rotateY(315deg) translateZ(-113px);*/
 }
 
-#imgObj{
-	/*position: absolute;*/
+img {
+    width: 100%;
+    height: 100%;
+    /*height: unset;*/
 }
 
-.positive-box{
-	width: 40%;
-	height: 78%;
-	position: absolute;
+#imgObj {
+    /*position: absolute;*/
+}
+
+.box {
+    width: 40%;
+    height: 78%;
+    position: absolute;
     left: 30%;
     top: 14%;
     overflow: hidden;
     /*background-color: #ededed;*/
 }
 
-.scale{
-	width: 32px;
-	height: 32px;
-	background-color: #f00;
-	position: absolute;
-	bottom: -16px;
-	/*top: -16px;*/
-	right: -16px;
-	/*cursor: se-resize;*/
-	background: url('./scale.png') no-repeat;
+.scale {
+    width: 32px;
+    height: 32px;
+    /*background-color: #f00;*/
+    position: absolute;
+    bottom: -16px;
+    /*top: -16px;*/
+    right: -16px;
+    /*cursor: se-resize;*/
+    background: url('./scale.png') no-repeat;
 }
 
-.rotate{
-	width: 32px;
-	height: 32px;
-	background-color: #f00;
-	position: absolute;
-	/*bottom: -16px;*/
-	top: -16px;
-	right: -16px;
-	background: url('./rotate.png') no-repeat;
-	/*cursor: se-resize;*/
+.rotate {
+    width: 32px;
+    height: 32px;
+    /*background-color: #f00;*/
+    position: absolute;
+    /*bottom: -16px;*/
+    top: -16px;
+    right: -16px;
+    background: url('./rotate.png') no-repeat;
+    /*cursor: se-resize;*/
 }
 
-.img-box{
-	position: absolute;
-	/*background-color: #abc;*/
-	width: 90px;
-	height:120px;
-	/*cursor: move;*/
+.select{
+    width: 32px;
+    height: 32px;
+    /*background-color: #f00;*/
+    position: absolute;
+    /*bottom: -16px;*/
+    bottom: -16px;
+    right: -16px;
+    background: url('./selected.png') no-repeat;
+    /*cursor: se-resize;*/
+}
+
+.img-box {
+    position: absolute;
+    /*background-color: #abc;*/
+    width: 90px;
+    height: 120px;
+    /*cursor: move;*/
+}
+
+.btn{
+    display: inline-block;
+    width: 100px;
+    height: 50px;
+    background: #b1b1b1;
+    text-align: center;
+    line-height: 50px;
+    color: #fff;
+}
+.btn:hover{
+    background: #8470FF;
 }
